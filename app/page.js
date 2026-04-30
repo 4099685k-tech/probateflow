@@ -1,10 +1,27 @@
+"use client";
+import { useState } from "react";
 import { mockLeads } from "@/data/mockLeads";
 import { calculateScore } from "@/lib/scoring";
 import StatCard from "@/components/StatCard";
 import LeadsTable from "@/components/LeadsTable";
+import ImportLeadsModal from "@/components/ImportLeadsModal";
+
+const initialLeads = mockLeads.map((l) => ({
+  ...l,
+  score: calculateScore(l),
+  leadType: "Probate",
+}));
 
 export default function DashboardPage() {
-  const leads = mockLeads.map((l) => ({ ...l, score: calculateScore(l) }));
+  const [leads, setLeads] = useState(initialLeads);
+
+  function handleImport(newLeads) {
+    const scored = newLeads.map((l) => ({
+      ...l,
+      score: calculateScore(l),
+    }));
+    setLeads((prev) => [...scored, ...prev]);
+  }
 
   const totalLeads = leads.length;
   const newLeads = leads.filter((l) => l.status === "New").length;
@@ -22,6 +39,7 @@ export default function DashboardPage() {
 
   return (
     <>
+      {/* Top bar */}
       <div className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
         <div>
           <h1 className="text-base font-semibold text-gray-900">Dashboard</h1>
@@ -29,7 +47,8 @@ export default function DashboardPage() {
             Orange County, CA &middot; April 2026
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
+          <ImportLeadsModal onImport={handleImport} />
           <button className="text-xs px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition-colors">
             Export CSV
           </button>
@@ -39,23 +58,25 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Content */}
       <div className="flex-1 p-6 space-y-6">
+        {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
           <StatCard
             label="Total Leads"
             value={totalLeads}
-            delta="+6 this month"
+            delta={`${newLeads} new leads`}
             deltaType="up"
             barColor="#1a4d8f"
-            barPercent={72}
+            barPercent={Math.min(Math.round((totalLeads / 50) * 100), 100)}
           />
           <StatCard
             label="New Leads"
             value={newLeads}
-            delta="+3 this week"
+            delta="Uncontacted"
             deltaType="up"
             barColor="#5a9cf5"
-            barPercent={33}
+            barPercent={Math.round((newLeads / totalLeads) * 100)}
           />
           <StatCard
             label="High-Value Opportunities"
@@ -75,6 +96,7 @@ export default function DashboardPage() {
           />
         </div>
 
+        {/* Leads table */}
         <LeadsTable leads={leads} />
       </div>
     </>
