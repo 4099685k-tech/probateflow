@@ -6,6 +6,7 @@ import StatCard from "@/components/StatCard";
 import LeadsTable from "@/components/LeadsTable";
 import ImportLeadsModal from "@/components/ImportLeadsModal";
 import AddLeadModal from "@/components/AddLeadModal";
+import CSVUpload from "@/components/CSVUpload";
 
 const initialLeads = mockLeads.map((l) => ({
   ...l,
@@ -17,10 +18,7 @@ export default function DashboardPage() {
   const [leads, setLeads] = useState(initialLeads);
 
   function handleImport(newLeads) {
-    const scored = newLeads.map((l) => ({
-      ...l,
-      score: calculateScore(l),
-    }));
+    const scored = newLeads.map((l) => ({ ...l, score: calculateScore(l) }));
     setLeads((prev) => [...scored, ...prev]);
   }
 
@@ -55,9 +53,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-3">
           <ImportLeadsModal onImport={handleImport} />
-          <button className="text-xs px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-            Export CSV
-          </button>
+          <CSVUpload onImport={handleImport} />
           <AddLeadModal onAdd={handleAddLead} />
         </div>
       </div>
