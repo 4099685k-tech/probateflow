@@ -5,6 +5,7 @@ import { calculateScore } from "@/lib/scoring";
 import StatCard from "@/components/StatCard";
 import LeadsTable from "@/components/LeadsTable";
 import ImportLeadsModal from "@/components/ImportLeadsModal";
+import AddLeadModal from "@/components/AddLeadModal";
 
 const initialLeads = mockLeads.map((l) => ({
   ...l,
@@ -21,6 +22,11 @@ export default function DashboardPage() {
       score: calculateScore(l),
     }));
     setLeads((prev) => [...scored, ...prev]);
+  }
+
+  function handleAddLead(newLead) {
+    const scored = { ...newLead, score: calculateScore(newLead) };
+    setLeads((prev) => [scored, ...prev]);
   }
 
   const totalLeads = leads.length;
@@ -52,15 +58,12 @@ export default function DashboardPage() {
           <button className="text-xs px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition-colors">
             Export CSV
           </button>
-          <button className="text-xs px-4 py-2 rounded-lg bg-[#0f2d5a] text-white hover:bg-[#1a4d8f] transition-colors font-medium">
-            + Add Lead
-          </button>
+          <AddLeadModal onAdd={handleAddLead} />
         </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 p-6 space-y-6">
-        {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
           <StatCard
             label="Total Leads"
@@ -96,7 +99,6 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Leads table */}
         <LeadsTable leads={leads} />
       </div>
     </>
